@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const { User, Tweet, Reply, Like, Followship, sequelize } = require('../models')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+const { relativeTime } = require('../helpers/date-helpers')
 const helpers = require('../_helpers')
 
 const userServices = {
@@ -201,7 +202,13 @@ const userServices = {
         nest: true
       })
       if (!RepliedTweets) throw new Error('此推文不存在')
-      cb(null, RepliedTweets)
+
+      const dateRepliedTweets = RepliedTweets.map(reply => ({
+        ...reply,
+        createdAt: relativeTime(reply.createdAt)
+      }))
+
+      cb(null, dateRepliedTweets)
     } catch (err) {
       cb(err)
     }
